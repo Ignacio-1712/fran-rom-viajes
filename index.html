@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fran & Rom - Tu Agencia de Viajes Confiable</title>
+    <meta name="description" content="Fran & Rom - Tu agencia de viajes confiable. Viajes a San Clemente, Las Toninas, Mar del Tuyú y más. ¡Reserva tu próximo viaje!">
+    <meta name="keywords" content="viajes, turismo, agencia de viajes, vacaciones, playa, destinos, Fran & Rom">
+    <meta name="author" content="Fran & Rom">
+    <meta property="og:title" content="Fran & Rom - Tu agencia de viajes">
+    <meta property="og:description" content="Viajes inolvidables a los mejores destinos">
+    <meta property="og:image" content="Imagenes/Logo con fondo.jpeg">
+    
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="Imagenes/Logo.jpeg">
+    <link rel="apple-touch-icon" href="Imagenes/Logo.jpeg">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="encabezado">
+        <div class="container">
+            <img src="Imagenes/Logo.jpeg" class="logo" alt="Logo Fran & Rom">
+            
+            <nav class="menu">
+                <a href="#inicio" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+
+                <a href="#servicios" class="nav-link">
+                    <i class="fas fa-concierge-bell"></i>
+                    <span>Servicios</span>
+                </a>
+
+                <a href="#comentarios" class="nav-link">
+                    <i class="fas fa-comments"></i>
+                    <span>Opiniones</span>
+                </a>
+
+                <a href="#contacto" class="nav-link">
+                    <i class="fas fa-address-book"></i>
+                    <span>Contacto</span>
+                </a>
+            </nav>
+
+            
+            <button class="menu-mobile" id="menuMobile">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="contenido-principal">
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">¡Bienvenidos a Tus Viajes!</h1>
+                <p class="hero-subtitle">Tu próxima aventura comienza aquí</p>
+                <img src="Imagenes/Logo con fondo.jpeg" alt="Fran & Rom Viajes" class="hero-image">
+                <a href="#servicios" class="btn-hero">Ver Destinos</a>
+            </div>
+        </section>
+
+        <div class="cuerpo container">
+            <section id="inicio" class="seccion fade-in">
+                <div class="seccion-header">
+                    <h1 class="seccion-titulo">Inicio</h1>
+                    <div class="seccion-linea"></div>
+                </div>
+                
+                <h2 class="subtitulo">¿Quiénes Somos?</h2>
+                <p class="texto-descripcion">En <strong>Fran & Rom</strong>, no solo planeamos tu viaje, creamos la experiencia perfecta. Nos apasiona conectar tus sueños con los destinos más increíbles, ocupándonos de cada detalle para que tú solo te preocupes por disfrutar. Confiar en nosotros es elegir tranquilidad, calidad y momentos inolvidables. Tu próxima aventura merece un comienzo excepcional: con nosotros, estás haciendo la mejor elección.</p>
+                
+                <div class="contenedor-imagenes">
+                    <div class="imagen-card">
+                        <img class="img-inicio" src="Imagenes/Micro 1.jpeg" alt="Micro de viajes 1">
+                        <p class="imagen-desc">Nuestras unidades premium</p>
+                    </div>
+                    <div class="imagen-card">
+                        <img class="img-inicio" src="Imagenes/Micro 2.jpeg" alt="Micro de viajes 2">
+                        <p class="imagen-desc">Comodidad y seguridad</p>
+                    </div>
+                </div>
+                
+                <div class="paradas-info">
+                    <h3 class="paradas-titulo">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Paradas del Recorrido
+                    </h3>
+                    <p class="paradas-texto"><strong>Recorrido:</strong> Loma de Zamora - Rotonda Llavallol - Vapor - Alpargatas - Ruta 4 - San Justo - Casanova - La Ferrere - Ruta 3 hasta el KM 38. Hacemos una parada de 20 minutos en Minotauro Parador.</p>
+                </div>
+            </section>
+
+            <section id="servicios" class="seccion fade-in">
+                <div class="seccion-header">
+                    <h1 class="seccion-titulo">Servicios</h1>
+                    <div class="seccion-linea"></div>
+                </div>
+                
+                <p class="texto-descripcion">Ofrecemos experiencias únicas a los siguientes destinos:</p>
+
+                <div class="contenedor-destinos">
+                    <div class="destino-card">
+                        <div class="destino-imagen">
+                            <img src="Imagenes/San Clemente.jpg" alt="San Clemente">
+                            <div class="destino-badge">
+                                <i class="fas fa-calendar-alt"></i>
+                                3 Fechas Disponibles
+                            </div>
+                        </div>
+                        <div class="destino-contenido">
+                            <h3 class="destino-titulo">San Clemente</h3>
+                            <p class="destino-descripcion"><strong>Fechas:</strong> 29 Enero al 01 Febrero, 14 Febrero al 18 Febrero, 20 Febrero al 24 Febrero</p>
+                            <button class="btn-reservar" data-destino="San Clemente">
+                                <i class="fab fa-whatsapp"></i>
+                                Reservar este destino
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="destino-card">
+                        <div class="destino-imagen">
+                            <img src="Imagenes/Las Toninas.jpg" alt="Las Toninas">
+                            <div class="destino-badge">
+                                <i class="fas fa-calendar-alt"></i>
+                                3 Fechas Disponibles
+                            </div>
+                        </div>
+                        <div class="destino-contenido">
+                            <h3 class="destino-titulo">Las Toninas</h3>
+                            <p class="destino-descripcion"><strong>Fechas:</strong> 29 Enero al 01 Febrero, 14 Febrero al 18 Febrero, 20 Febrero al 24 Febrero</p>
+                            <button class="btn-reservar" data-destino="Las Toninas">
+                                <i class="fab fa-whatsapp"></i>
+                                Reservar este destino
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="destino-card">
+                        <div class="destino-imagen">
+                            <img src="Imagenes/Mar del Tuyu.png" alt="Mar del Tuyú">
+                            <div class="destino-badge">
+                                <i class="fas fa-calendar-alt"></i>
+                                3 Fechas Disponibles
+                            </div>
+                        </div>
+                        <div class="destino-contenido">
+                            <h3 class="destino-titulo">Mar del Tuyú</h3>
+                            <p class="destino-descripcion"><strong>Fechas:</strong> 29 Enero al 01 Febrero, 14 Febrero al 18 Febrero, 20 Febrero al 24 Febrero</p>
+                            <button class="btn-reservar" data-destino="Mar del Tuyu">
+                                <i class="fab fa-whatsapp"></i>
+                                Reservar este destino
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="destino-card">
+                        <div class="destino-imagen">
+                            <img src="Imagenes/San Bernardo.png" alt="San Bernardo">
+                            <div class="destino-badge">
+                                <i class="fas fa-calendar-alt"></i>
+                                3 Fechas Disponibles
+                            </div>
+                        </div>
+                        <div class="destino-contenido">
+                            <h3 class="destino-titulo">San Bernardo</h3>
+                            <p class="destino-descripcion"><strong>Fechas:</strong> 29 Enero al 01 Febrero, 14 Febrero al 18 Febrero, 20 Febrero al 24 Febrero</p>
+                            <button class="btn-reservar" data-destino="San Bernardo">
+                                <i class="fab fa-whatsapp"></i>
+                                Reservar este destino
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="destino-card">
+                        <div class="destino-imagen">
+                            <img src="Imagenes/Santa Teresita.png" alt="Santa Teresita">
+                            <div class="destino-badge">
+                                <i class="fas fa-calendar-alt"></i>
+                                3 Fechas Disponibles
+                            </div>
+                        </div>
+                        <div class="destino-contenido">
+                            <h3 class="destino-titulo">Santa Teresita</h3>
+                            <p class="destino-descripcion"><strong>Fechas:</strong> 29 Enero al 01 Febrero, 14 Febrero al 18 Febrero, 20 Febrero al 24 Febrero</p>
+                            <button class="btn-reservar" data-destino="Santa Teresita">
+                                <i class="fab fa-whatsapp"></i>
+                                Reservar este destino
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="destino-card">
+                        <div class="destino-imagen">
+                            <img src="Imagenes/Mar de ajó.webp" alt="Mar de Ajó">
+                            <div class="destino-badge">
+                                <i class="fas fa-calendar-alt"></i>
+                                3 Fechas Disponibles
+                            </div>
+                        </div>
+                        <div class="destino-contenido">
+                            <h3 class="destino-titulo">Mar de Ajó</h3>
+                            <p class="destino-descripcion"><strong>Fechas:</strong> 29 Enero al 01 Febrero, 14 Febrero al 18 Febrero, 20 Febrero al 24 Febrero</p>
+                            <button class="btn-reservar" data-destino="Mar de Ajó">
+                                <i class="fab fa-whatsapp"></i>
+                                Reservar este destino
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contacto" class="seccion fade-in">
+                <div class="seccion-header">
+                    <h1 class="seccion-titulo">Contacto</h1>
+                    <div class="seccion-linea"></div>
+                </div>
+                
+                <p class="texto-descripcion">¡Estamos aquí para ayudarte! Contáctanos por cualquiera de estos medios:</p>
+                
+                <div class="contacto-contenedor">
+                    <div class="contacto-item">
+                        <div class="contacto-icono">
+                            <i class="fab fa-facebook-f"></i>
+                        </div>
+                        <div class="contacto-info">
+                            <h4>Facebook</h4>
+                            <a href="https://www.facebook.com/jose.luis.gonzalez.711263" target="_blank" class="contacto-link">
+                                Fran & Rom / González José Luis
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="contacto-item">
+                        <div class="contacto-icono whatsapp-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="contacto-info">
+                            <h4>WhatsApp 1</h4>
+                            <a href="https://wa.me/5491132587520?text=Hola%20Fran%20%26%20Rom,%20quiero%20hacer%20una%20consulta" target="_blank" class="contacto-link">
+                                +54 9 11 3258-7520
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="contacto-item">
+                        <div class="contacto-icono whatsapp-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="contacto-info">
+                            <h4>WhatsApp 2</h4>
+                            <a href="https://wa.me/5491166099970?text=Hola%20Fran%20%26%20Rom,%20quiero%20hacer%20una%20consulta" target="_blank" class="contacto-link">
+                                +54 9 11 6609-9970
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contacto-horario">
+                    <h4>
+                        <i class="far fa-clock"></i>
+                        Horario de Atención
+                    </h4>
+                    <p>Lunes a Viernes: 9:00 - 20:00 hs</p>
+                    <p>Sábados: 9:00 - 14:00 hs</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <section id="comentarios" class="seccion fade-in">
+        <div class="seccion-header">
+            <h1 class="seccion-titulo">Opiniones de Nuestros Viajeros</h1>
+            <div class="seccion-linea"></div>
+        </div>
+
+        <!-- Formulario -->
+        <form id="formComentario" class="comentarios-form">
+            <input type="text" id="nombre" placeholder="Tu nombre" required>
+            
+            <select id="valoracion" required>
+            <option value="">Calificación</option>
+            <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+            <option value="4">⭐⭐⭐⭐ Muy bueno</option>
+            <option value="3">⭐⭐⭐ Regular</option>
+            <option value="2">⭐⭐ Malo</option>
+            <option value="1">⭐ Muy malo</option>
+            </select>
+
+            <textarea id="comentario" placeholder="Escribí tu comentario..." required></textarea>
+            <button type="submit" class="btn-hero">Enviar comentario</button>
+        </form>
+
+        <!-- Filtros -->
+        <div class="comentarios-filtros">
+            <button data-filtro="todos">Todos</button>
+            <button data-filtro="buenos">Buenos</button>
+            <button data-filtro="malos">Malos</button>
+        </div>
+
+        <!-- Lista -->
+        <div id="listaComentarios" class="comentarios-lista"></div>
+    </section>
+
+
+    <footer class="pie-pagina">
+        <div class="container">
+            <div class="footer-contenido">
+                <div class="footer-logo">
+                    <img src="Imagenes/Logo.jpeg" alt="Logo Fran & Rom" class="footer-logo-img">
+                    <p class="footer-slogan">Tu viaje perfecto comienza aquí</p>
+                </div>
+                
+                <div class="footer-enlaces">
+                    <h4>Enlaces Rápidos</h4>
+                    <a href="#inicio">Inicio</a>
+                    <a href="#servicios">Servicios</a>
+                    <a href="#contacto">Contacto</a>
+                </div>
+                
+                <div class="footer-redes">
+                    <h4>Síguenos</h4>
+                    <div class="redes-iconos">
+                        <a href="https://www.facebook.com/jose.luis.gonzalez.711263" target="_blank" class="redes-link">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://wa.me/5491132587520" target="_blank" class="redes-link">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-copyright">
+                <p>&copy; 2025 Fran & Rom - Todos los derechos reservados</p>
+                <p class="footer-creditos">Diseñado con <i class="fas fa-heart"></i> para viajeros</p>
+            </div>
+        </div>
+    </footer>
+
+    <a href="#" class="floating-btn" id="backToTop">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+    
+    <!-- Modal de confirmación -->
+    <div class="modal" id="reservaModal">
+        <div class="modal-contenido">
+            <span class="modal-cerrar" id="modalCerrar">&times;</span>
+            <h3 class="modal-titulo">Reservar Destino</h3>
+            <p id="modalDestino"></p>
+            <div class="modal-acciones">
+                <button class="btn-modal btn-cancelar" id="modalCancelar">Cancelar</button>
+                <button class="btn-modal btn-confirmar" id="modalConfirmar">
+                    <i class="fab fa-whatsapp"></i>
+                    Contactar por WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

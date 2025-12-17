@@ -1207,3 +1207,200 @@ body {
 .comentarios-form button {
     width: 100%;
 }
+<style>
+    /* ESTILOS PARA LOS COMENTARIOS */
+    #comentarios-container {
+        margin-top: 30px;
+    }
+
+    .comentarios-lista {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .comentario-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        border-left: 5px solid #ddd;
+    }
+
+    .comentario-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .comentario-bueno {
+        border-left-color: #4CAF50;
+        background: linear-gradient(135deg, #f0fff0 0%, #ffffff 100%);
+    }
+
+    .comentario-malo {
+        border-left-color: #f44336;
+        background: linear-gradient(135deg, #fff0f0 0%, #ffffff 100%);
+    }
+
+    .comentario-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .comentario-autor {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1em;
+    }
+
+    .comentario-autor i {
+        color: #3498db;
+    }
+
+    .comentario-fecha {
+        font-size: 0.9em;
+        color: #7f8c8d;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .comentario-estrellas {
+        font-size: 1.5em;
+        color: #FFD700;
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .comentario-valoracion {
+        font-size: 0.8em;
+        color: #666;
+    }
+
+    .comentario-texto {
+        line-height: 1.6;
+        color: #2c3e50;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+        margin: 15px 0;
+        font-style: italic;
+        position: relative;
+    }
+
+    .comentario-texto i.fa-quote-left {
+        position: absolute;
+        top: 5px;
+        left: 10px;
+        color: #3498db;
+        opacity: 0.5;
+    }
+
+    .comentario-texto i.fa-quote-right {
+        position: absolute;
+        bottom: 5px;
+        right: 10px;
+        color: #3498db;
+        opacity: 0.5;
+    }
+
+    .comentario-clasificacion {
+        text-align: right;
+        margin-top: 10px;
+    }
+
+    .badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .badge.bueno {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .badge.malo {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .comentarios-filtros {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 25px 0;
+    }
+
+    .filtro-btn {
+        padding: 10px 25px;
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .filtro-btn:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+    }
+
+    .filtro-btn.activo {
+        background: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+
+    .cargando, .sin-comentarios, .error-comentario {
+        text-align: center;
+        padding: 40px;
+        grid-column: 1 / -1;
+        color: #666;
+        font-size: 1.1em;
+    }
+
+    .cargando i {
+        margin-right: 10px;
+        color: #3498db;
+    }
+
+    .sin-comentarios i {
+        margin-right: 10px;
+        color: #3498db;
+        font-size: 1.5em;
+    }
+
+    .error-comentario i {
+        margin-right: 10px;
+        color: #e74c3c;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .comentarios-lista {
+            grid-template-columns: 1fr;
+        }
+        
+        .comentario-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .comentarios-filtros {
+            flex-wrap: wrap;
+        }
+    }

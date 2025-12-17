@@ -280,7 +280,7 @@
         </div>
     </main>
 
-    <section id="comentarios" class="seccion fade-in">
+    <section id="comentarios" class="seccion fade-in">   
         <div class="seccion-header">
             <h1 class="seccion-titulo">Opiniones de Nuestros Viajeros</h1>
             <div class="seccion-linea"></div>
@@ -294,40 +294,194 @@
             data-netlify="true"
             netlify-honeypot="bot-field">
 
-        <input type="hidden" name="form-name" value="comentarios">
-        <p hidden>
-            <input name="bot-field">
-        </p>
+            <input type="hidden" name="form-name" value="comentarios">
+            <p hidden>
+                <input name="bot-field">
+            </p>
 
-        <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
 
-        <select id="valoracion" name="valoracion" required>
-            <option value="">Calificación</option>
-            <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
-            <option value="4">⭐⭐⭐⭐ Muy bueno</option>
-            <option value="3">⭐⭐⭐ Regular</option>
-            <option value="2">⭐⭐ Malo</option>
-            <option value="1">⭐ Muy malo</option>
-        </select>
+            <select id="valoracion" name="valoracion" required>
+                <option value="">Calificación</option>
+                <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                <option value="4">⭐⭐⭐⭐ Muy bueno</option>
+                <option value="3">⭐⭐⭐ Regular</option>
+                <option value="2">⭐⭐ Malo</option>
+                <option value="1">⭐ Muy malo</option>
+            </select>
 
-        <textarea id="comentario"
-                    name="comentario"
-                    placeholder="Escribí tu comentario..."
-                    required></textarea>
+            <textarea id="comentario"
+                        name="comentario"
+                        placeholder="Escribí tu comentario..."
+                        required></textarea>
 
-        <button type="submit" class="btn-hero">Enviar comentario</button>
+            <button type="submit" class="btn-hero">Enviar comentario</button>
         </form>
-
 
         <!-- Filtros -->
         <div class="comentarios-filtros">
-            <button data-filtro="todos">Todos</button>
-            <button data-filtro="buenos">Buenos</button>
-            <button data-filtro="malos">Malos</button>
+            <button data-filtro="todos" class="filtro-btn activo">Todos</button>
+            <button data-filtro="buenos" class="filtro-btn">Buenos</button>
+            <button data-filtro="malos" class="filtro-btn">Malos</button>
         </div>
 
-        <!-- Lista -->
-        <div id="listaComentarios" class="comentarios-lista"></div>
+        <!-- Contenedor donde se mostrarán los comentarios -->
+        <div id="comentarios-container">
+            <div id="lista-comentarios" class="comentarios-lista">
+                <!-- Los comentarios se cargarán aquí automáticamente -->
+            </div>
+        </div>
+
+        <!-- Script para cargar y mostrar comentarios -->
+        <script>
+        // Función para cargar comentarios desde Netlify Function
+        async function cargarComentarios() {
+            try {
+                const listaComentarios = document.getElementById('lista-comentarios');
+                
+                // Mostrar cargando
+                listaComentarios.innerHTML = '<div class="cargando"><i class="fas fa-spinner fa-spin"></i> Cargando comentarios...</div>';
+                
+                const respuesta = await fetch('/.netlify/functions/ObtenerComentarios');
+                
+                if (!respuesta.ok) {
+                    throw new Error('Error al cargar comentarios');
+                }
+                
+                const comentarios = await respuesta.json();
+                mostrarComentarios(comentarios);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('lista-comentarios').innerHTML = 
+                    '<div class="error-comentario"><i class="fas fa-exclamation-triangle"></i> Error cargando comentarios. Intenta recargar la página.</div>';
+            }
+        }
+
+        // Función para mostrar los comentarios en la página
+        function mostrarComentarios(comentarios, filtro = 'todos') {
+            const contenedor = document.getElementById('lista-comentarios');
+            
+            if (!comentarios || comentarios.length === 0) {
+                contenedor.innerHTML = '<div class="sin-comentarios"><i class="far fa-comment"></i> Sé el primero en comentar!</div>';
+                return;
+            }
+            
+            // Filtrar comentarios si es necesario
+            let comentariosFiltrados = comentarios;
+            if (filtro === 'buenos') {
+                comentariosFiltrados = comentarios.filter(c => c.clasificacion === 'bueno');
+            } else if (filtro === 'malos') {
+                comentariosFiltrados = comentarios.filter(c => c.clasificacion === 'malo');
+            }
+            
+            if (comentariosFiltrados.length === 0) {
+                contenedor.innerHTML = `<div class="sin-comentarios"><i class="far fa-comment"></i> No hay comentarios ${filtro === 'todos' ? '' : filtro}</div>`;
+                return;
+            }
+            
+            let html = '';
+            
+            comentariosFiltrados.forEach(comentario => {
+                // Formatear fecha
+                const fecha = new Date(comentario.fecha);
+                const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Crear estrellas según valoración
+                let estrellas = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= comentario.valoracion) {
+                        estrellas += '⭐';
+                    } else {
+                        estrellas += '☆';
+                    }
+                }
+                
+                // Determinar clase CSS según clasificación
+                let claseCss = 'comentario-card';
+                if (comentario.clasificacion === 'bueno') {
+                    claseCss += ' comentario-bueno';
+                } else if (comentario.clasificacion === 'malo') {
+                    claseCss += ' comentario-malo';
+                }
+                
+                html += `
+                    <div class="${claseCss}">
+                        <div class="comentario-header">
+                            <div class="comentario-autor">
+                                <i class="fas fa-user"></i>
+                                <strong>${comentario.nombre}</strong>
+                            </div>
+                            <div class="comentario-fecha">
+                                <i class="far fa-clock"></i>
+                                ${fechaFormateada}
+                            </div>
+                        </div>
+                        <div class="comentario-estrellas">
+                            ${estrellas}
+                            <span class="comentario-valoracion">(${comentario.valoracion}/5)</span>
+                        </div>
+                        <div class="comentario-texto">
+                            <i class="fas fa-quote-left"></i>
+                            ${comentario.comentario}
+                            <i class="fas fa-quote-right"></i>
+                        </div>
+                        <div class="comentario-clasificacion">
+                            <span class="badge ${comentario.clasificacion}">
+                                <i class="fas fa-${comentario.clasificacion === 'bueno' ? 'thumbs-up' : 'thumbs-down'}"></i>
+                                ${comentario.clasificacion === 'bueno' ? 'Positivo' : 'Crítico'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            contenedor.innerHTML = html;
+        }
+
+        // Manejar filtros
+        document.addEventListener('DOMContentLoaded', function() {
+            const filtroBtns = document.querySelectorAll('.filtro-btn');
+            
+            filtroBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remover clase activa de todos
+                    filtroBtns.forEach(b => b.classList.remove('activo'));
+                    // Agregar clase activa al botón clickeado
+                    this.classList.add('activo');
+                    
+                    // Recargar comentarios con el filtro seleccionado
+                    const filtro = this.getAttribute('data-filtro');
+                    cargarComentarios().then(() => {
+                        // Después de cargar, aplicar filtro
+                        fetch('/.netlify/functions/ObtenerComentarios')
+                            .then(res => res.json())
+                            .then(comentarios => mostrarComentarios(comentarios, filtro));
+                    });
+                });
+            });
+            
+            // Cargar comentarios cuando la página se carga
+            cargarComentarios();
+            
+            // Recargar comentarios cada 60 segundos
+            setInterval(cargarComentarios, 60000);
+            
+            // Cuando se envía el formulario, recargar comentarios después de 2 segundos
+            const formulario = document.getElementById('formComentario');
+            if (formulario) {
+                formulario.addEventListener('submit', function() {
+                    setTimeout(cargarComentarios, 2000);
+                });
+            }
+        });
+        </script>
     </section>
 
 
@@ -387,6 +541,5 @@
     </div>
 
     <script src="scripts.js"></script>
-    <script src="netlify/functions/ClasificarComentarios.js"></script>
 </body>
 </html>

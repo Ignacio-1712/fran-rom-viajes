@@ -1,11 +1,22 @@
 [build]
   publish = "."
+  functions = "netlify/functions"
 
-# Esto conecta tu formulario con tu función automáticamente
+# Configuración del formulario
 [[forms]]
   name = "comentarios"
+  action = "/"
   
   [forms.handlers]
     [forms.handlers.background]
       function = "ClasificarComentarios"
-      forward_headers = true
+
+# Redirecciones
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Configuración de funciones
+[functions]
+  node_bundler = "esbuild"

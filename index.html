@@ -291,6 +291,7 @@
             class="comentarios-form"
             name="comentarios"
             method="POST"
+            action="/"
             data-netlify="true"
             netlify-honeypot="bot-field">
 
@@ -480,6 +481,22 @@
                     setTimeout(cargarComentarios, 2000);
                 });
             }
+        });
+        </script>
+        <script>
+        // Manejar el envío del formulario
+        document.getElementById('formComentario').addEventListener('submit', async function(e) {
+            // No prevenir el comportamiento por defecto - Netlify lo maneja
+            console.log('Formulario enviado a Netlify Forms');
+            
+            // Mostrar mensaje al usuario
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            submitBtn.disabled = true;
+            
+            // La función de Netlify se ejecutará automáticamente
+            // Netlify Forms redirigirá a la página de éxito
         });
         </script>
     </section>

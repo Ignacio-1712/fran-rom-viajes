@@ -1,13 +1,41 @@
+// netlify/functions/ClasificarComentarios.js
 export async function handler(event) {
   console.log("=== INICIANDO PROCESO DE COMENTARIO ===");
   
   try {
-    const body = JSON.parse(event.body);
+    let body;
+    
+    // Verificar si viene de JavaScript directo
+    if (event.body) {
+      body = JSON.parse(event.body);
+    } else {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "No hay datos" })
+      };
+    }
+    
     console.log("Body recibido:", JSON.stringify(body, null, 2));
     
-    const nombre = body.payload.data.nombre;
-    const comentario = body.payload.data.comentario;
-    const valoracion = parseInt(body.payload.data.valoracion);
+    // Manejar dos posibles formatos
+    let nombre, comentario, valoracion;
+    
+    if (body.payload && body.payload.data) {
+      // Formato de JavaScript directo
+      nombre = body.payload.data.nombre;
+      comentario = body.payload.data.comentario;
+      valoracion = parseInt(body.payload.data.valoracion);
+    } else if (body.data) {
+      // Formato alternativo
+      nombre = body.data.nombre;
+      comentario = body.data.comentario;
+      valoracion = parseInt(body.data.valoracion);
+    } else {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Formato de datos incorrecto" })
+      };
+    }
     
     console.log("Datos extraídos:", { nombre, comentario, valoracion });
 
@@ -124,7 +152,6 @@ export async function handler(event) {
         });
         
         console.log("Supabase response status:", response.status);
-        console.log("Supabase response headers:", response.headers);
         
         if (!response.ok) {
           const errorText = await response.text();
@@ -147,13 +174,14 @@ export async function handler(event) {
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*' // IMPORTANTE para CORS
       },
       body: JSON.stringify({ 
         clasificacion,
         mensaje: clasificacion === 'bloqueado' 
           ? 'Comentario bloqueado por contenido inapropiado' 
-          : 'Comentario procesado correctamente'
+          : '✅ Comentario enviado y moderado correctamente'
       })
     };
 
@@ -164,7 +192,8 @@ export async function handler(event) {
     return { 
       statusCode: 500,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({ 
         error: "Error interno del servidor",

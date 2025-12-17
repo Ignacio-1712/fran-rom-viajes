@@ -1,0 +1,11 @@
+[build]
+  publish = "."
+
+# Esto conecta tu formulario con tu función automáticamente
+[[forms]]
+  name = "comentarios"
+  
+  [forms.handlers]
+    [forms.handlers.background]
+      function = "ClasificarComentarios"
+      forward_headers = true

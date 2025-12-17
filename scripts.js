@@ -25,16 +25,20 @@ function mostrarModalReserva(destino) {
     const modal = document.getElementById('reservaModal');
     const modalDestino = document.getElementById('modalDestino');
     
-    modalDestino.textContent = `¿Deseas contactarnos para reservar en ${destino}?`;
-    modal.classList.add('mostrar');
-    document.body.style.overflow = 'hidden';
+    if (modal && modalDestino) {
+        modalDestino.textContent = `¿Deseas contactarnos para reservar en ${destino}?`;
+        modal.classList.add('mostrar');
+        document.body.style.overflow = 'hidden';
+    }
 }
 
 function cerrarModal() {
     const modal = document.getElementById('reservaModal');
-    modal.classList.remove('mostrar');
-    document.body.style.overflow = 'auto';
-    destinoSeleccionado = "";
+    if (modal) {
+        modal.classList.remove('mostrar');
+        document.body.style.overflow = 'auto';
+        destinoSeleccionado = "";
+    }
 }
 
 function confirmarReserva() {
@@ -57,7 +61,9 @@ function inicializarBotonesReserva() {
         boton.addEventListener('click', function(e) {
             e.preventDefault();
             const destino = this.getAttribute('data-destino');
-            mostrarModalReserva(destino);
+            if (destino) {
+                mostrarModalReserva(destino);
+            }
         });
     });
 }
@@ -129,7 +135,7 @@ function mejorarExperienciaMovil() {
         document.addEventListener('touchstart', function() {}, {passive: true});
     }
     
-    // Prevenir zoom en inputs (si los agregas en el futuro)
+    // Prevenir zoom en inputs
     document.addEventListener('touchstart', function(event) {
         if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
             event.preventDefault();
@@ -179,7 +185,7 @@ function inicializarModal() {
     
     // Cerrar modal con ESC
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal.classList.contains('mostrar')) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('mostrar')) {
             cerrarModal();
         }
     });
@@ -199,6 +205,57 @@ function inicializarContadorVisitas() {
     console.log(`Visitas a la página: ${localStorage.getItem('visitCount')}`);
 }
 
+// ===== FUNCIONALIDAD DE COMENTARIOS =====
+function inicializarComentarios() {
+    const formComentario = document.getElementById('formComentario');
+    
+    if (!formComentario) return;
+    
+    // Lista de palabras prohibidas
+    const palabrasProhibidas = [
+        "puto", "mierda", "idiota", "pelotudo", "concha", "boludo"
+    ];
+    
+    function contieneLenguajeOfensivo(texto) {
+        const textoLower = texto.toLowerCase();
+        return palabrasProhibidas.some(palabra =>
+            textoLower.includes(palabra)
+        );
+    }
+    
+    function tipoComentario(valoracion) {
+        return valoracion >= 4 ? "bueno" : "malo";
+    }
+    
+    // Configurar el formulario
+    formComentario.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const nombreInput = document.getElementById('nombre');
+        const comentarioInput = document.getElementById('comentario');
+        const valoracionSelect = document.getElementById('valoracion');
+        
+        const nombre = nombreInput.value.trim();
+        const comentario = comentarioInput.value.trim();
+        const valoracion = parseInt(valoracionSelect.value);
+        
+        if (!nombre || !comentario || !valoracion) {
+            alert("Por favor completa todos los campos");
+            return;
+        }
+        
+        if (contieneLenguajeOfensivo(comentario)) {
+            alert("⚠️ Tu comentario contiene lenguaje ofensivo y no puede ser publicado.");
+            return;
+        }
+        
+        // Aquí es donde se enviaría el formulario a Netlify
+        // Por ahora, solo mostrar mensaje de éxito
+        alert("¡Gracias por tu comentario! Será revisado antes de publicarse.");
+        formComentario.reset();
+    });
+}
+
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Fran & Rom - Sistema cargado correctamente');
@@ -211,6 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
     inicializarAnimacionesScroll();
     inicializarModal();
     inicializarContadorVisitas();
+    inicializarComentarios();
     
     // Efecto de carga
     setTimeout(() => {
@@ -237,7 +295,7 @@ window.addEventListener('offline', function() {
 });
 
 // ===== COMPROBACIÓN DE IMÁGENES FALTANTES =====
-document.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('DOMContentLoaded', function() {
     const images = document.querySelectorAll('img');
     images.forEach(img => {
         img.addEventListener('error', function() {
@@ -246,86 +304,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-
-const palabrasProhibidas = [
-  "puto", "mierda", "idiota", "pelotudo", "concha", "boludo"
-];
-
-function contieneLenguajeOfensivo(texto) {
-  const textoLower = texto.toLowerCase();
-  return palabrasProhibidas.some(palabra =>
-    textoLower.includes(palabra)
-  );
-}
-
-if (contieneLenguajeOfensivo(comentario)) {
-  alert("⚠️ Tu comentario contiene lenguaje ofensivo y no puede ser publicado.");
-  return;
-}
-
-function tipoComentario(valoracion) {
-  return valoracion >= 4 ? "bueno" : "malo";
-}
-
-const form = document.getElementById("formComentario");
-const lista = document.getElementById("listaComentarios");
-
-form.addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const nombre = nombre.value.trim();
-  const comentario = document.getElementById("comentario").value.trim();
-  const valoracion = parseInt(document.getElementById("valoracion").value);
-
-  if (contieneLenguajeOfensivo(comentario)) {
-    alert("⚠️ Comentario no permitido");
-    return;
-  }
-
-  const nuevoComentario = {
-    nombre,
-    comentario,
-    valoracion,
-    tipo: tipoComentario(valoracion)
-  };
-
-  guardarComentario(nuevoComentario);
-  mostrarComentarios();
-  form.reset();
-});
-
-function guardarComentario(comentario) {
-  const comentarios = JSON.parse(localStorage.getItem("comentarios")) || [];
-  comentarios.push(comentario);
-  localStorage.setItem("comentarios", JSON.stringify(comentarios));
-}
-
-function mostrarComentarios(filtro = "todos") {
-  lista.innerHTML = "";
-  const comentarios = JSON.parse(localStorage.getItem("comentarios")) || [];
-
-  comentarios
-    .filter(c =>
-      filtro === "todos" ? true : c.tipo === filtro
-    )
-    .forEach(c => {
-      const div = document.createElement("div");
-      div.className = `comentario ${c.tipo}`;
-      div.innerHTML = `
-        <h4>${c.nombre}</h4>
-        <p>${c.comentario}</p>
-        <span>${"⭐".repeat(c.valoracion)}</span>
-      `;
-      lista.appendChild(div);
-    });
-}
-
-mostrarComentarios();
-
-document.querySelectorAll(".comentarios-filtros button")
-  .forEach(btn => {
-    btn.addEventListener("click", () => {
-      mostrarComentarios(btn.dataset.filtro);
-    });
-  });

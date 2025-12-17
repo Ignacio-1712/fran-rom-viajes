@@ -1177,3 +1177,33 @@ body {
   border: none;
   cursor: pointer;
 }
+
+.comentarios-form {
+    display: grid;
+    gap: 15px;
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+.comentarios-form input,
+.comentarios-form select,
+.comentarios-form textarea {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+}
+
+.comentarios-form select {
+    cursor: pointer;
+}
+
+.comentarios-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.comentarios-form button {
+    width: 100%;
+}

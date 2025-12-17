@@ -287,21 +287,37 @@
         </div>
 
         <!-- Formulario -->
-        <form id="formComentario" class="comentarios-form">
-            <input type="text" id="nombre" placeholder="Tu nombre" required>
-            
-            <select id="valoracion" required>
+        <form id="formComentario"
+            class="comentarios-form"
+            name="comentarios"
+            method="POST"
+            data-netlify="true"
+            netlify-honeypot="bot-field">
+
+        <input type="hidden" name="form-name" value="comentarios">
+        <p hidden>
+            <input name="bot-field">
+        </p>
+
+        <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+
+        <select id="valoracion" name="valoracion" required>
             <option value="">Calificación</option>
             <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
             <option value="4">⭐⭐⭐⭐ Muy bueno</option>
             <option value="3">⭐⭐⭐ Regular</option>
             <option value="2">⭐⭐ Malo</option>
             <option value="1">⭐ Muy malo</option>
-            </select>
+        </select>
 
-            <textarea id="comentario" placeholder="Escribí tu comentario..." required></textarea>
-            <button type="submit" class="btn-hero">Enviar comentario</button>
+        <textarea id="comentario"
+                    name="comentario"
+                    placeholder="Escribí tu comentario..."
+                    required></textarea>
+
+        <button type="submit" class="btn-hero">Enviar comentario</button>
         </form>
+
 
         <!-- Filtros -->
         <div class="comentarios-filtros">
@@ -371,5 +387,6 @@
     </div>
 
     <script src="scripts.js"></script>
+    <script src="netlify/functions/ClasificarComentarios.js"></script>
 </body>
 </html>

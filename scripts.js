@@ -134,13 +134,6 @@ function mejorarExperienciaMovil() {
         // Mejorar clics en móviles
         document.addEventListener('touchstart', function() {}, {passive: true});
     }
-    
-    // Prevenir zoom en inputs
-    document.addEventListener('touchstart', function(event) {
-        if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
-            event.preventDefault();
-        }
-    }, { passive: false });
 }
 
 // ===== ANIMACIONES DE SCROLL =====
@@ -204,33 +197,11 @@ function inicializarContadorVisitas() {
     // Solo para depuración
     console.log(`Visitas a la página: ${localStorage.getItem('visitCount')}`);
 }
-
-// ===== FUNCIONALIDAD DE COMENTARIOS =====
-function inicializarComentarios() {
-    const formComentario = document.getElementById('formComentario');
-    
-    if (!formComentario) return;
-    
-    // Lista de palabras prohibidas
-    const palabrasProhibidas = [
-        "puto", "mierda", "idiota", "pelotudo", "concha", "boludo"
-    ];
-    
-    function contieneLenguajeOfensivo(texto) {
-        const textoLower = texto.toLowerCase();
-        return palabrasProhibidas.some(palabra =>
-            textoLower.includes(palabra)
-        );
-    }
     
     function tipoComentario(valoracion) {
         return valoracion >= 4 ? "bueno" : "malo";
     }
-    
-    // Configurar el formulario
-    formComentario.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
+     
         const nombreInput = document.getElementById('nombre');
         const comentarioInput = document.getElementById('comentario');
         const valoracionSelect = document.getElementById('valoracion');
@@ -248,13 +219,6 @@ function inicializarComentarios() {
             alert("⚠️ Tu comentario contiene lenguaje ofensivo y no puede ser publicado.");
             return;
         }
-        
-        // Aquí es donde se enviaría el formulario a Netlify
-        // Por ahora, solo mostrar mensaje de éxito
-        alert("¡Gracias por tu comentario! Será revisado antes de publicarse.");
-        formComentario.reset();
-    });
-}
 
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -268,7 +232,6 @@ document.addEventListener('DOMContentLoaded', function() {
     inicializarAnimacionesScroll();
     inicializarModal();
     inicializarContadorVisitas();
-    inicializarComentarios();
     
     // Efecto de carga
     setTimeout(() => {

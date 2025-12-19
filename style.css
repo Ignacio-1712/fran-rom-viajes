@@ -1404,3 +1404,11 @@ body {
             flex-wrap: wrap;
         }
     }
+
+/* ===== FIX INPUTS MOBILE ===== */
+input,
+textarea,
+select,
+button {
+    font-size: 16px;
+}

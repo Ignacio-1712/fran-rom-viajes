@@ -131,9 +131,13 @@ function mejorarExperienciaMovil() {
         // Agregar clase para estilos específicos
         document.body.classList.add('mobile-device');
         
-        // Mejorar clics en móviles
-        document.addEventListener('touchstart', function() {}, {passive: true});
-    }
+        const menuBtn = document.querySelector('.menu-toggle');
+        const menu = document.querySelector('.nav-menu');
+
+        menuBtn.addEventListener('click', () => {
+            menu.classList.toggle('activo');
+        });
+
 }
 
 // ===== ANIMACIONES DE SCROLL =====

@@ -13,7 +13,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_hDJqmkRa4pTk-CXnnY61tA__6Y6HGYM";
 
 const HF_API_URL =
   "https://api-inference.huggingface.co/models/pysentimiento/robertuito-sentiment-analysis";
-const HF_API_KEY = "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";
+const HF_API_KEY = "";
 
 
 /************************************

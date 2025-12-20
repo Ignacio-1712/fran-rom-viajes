@@ -270,8 +270,7 @@ function inicializarComentarios() {
  ************************************/
 
 function inicializarMenuMovil() {
-    // Usa el ID CORRECTO de tu botón
-    const btn = document.getElementById("menuMobileBtn"); // ← Cambié a menuMobileBtn
+    const btn = document.getElementById("menuMobileBtn");
     const menu = document.querySelector(".menu");
 
     if (!btn || !menu) {
@@ -281,6 +280,7 @@ function inicializarMenuMovil() {
 
     console.log('Inicializando menú móvil...');
     
+    // CORREGIDO: addEventListener, no adEventListener
     btn.addEventListener("click", () => {
         menu.classList.toggle("activo");
         document.body.style.overflow = menu.classList.contains("activo") ? "hidden" : "";

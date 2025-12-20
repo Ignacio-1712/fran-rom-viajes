@@ -286,8 +286,10 @@
             <div class="seccion-linea"></div>
         </div>
 
-        <!-- Formulario MODIFICADO -->
-           <form id="formComentario" class="comentarios-form">
+           <!-- Formulario CORREGIDO con los IDs correctos -->
+            <form id="formComentario" class="comentarios-form">
+                <div id="mensajeFormulario" class="mensaje-formulario"></div>
+                
                 <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
                 
                 <select id="valoracion" name="valoracion" required>
@@ -301,7 +303,7 @@
                 
                 <textarea id="comentario" name="comentario" placeholder="Escribe tu comentario..." required rows="4"></textarea>
                 
-                <button type="submit" class="btn-hero">
+                <button type="submit" class="btn-hero" id="btnEnviar">
                     <i class="fas fa-paper-plane"></i> Enviar comentario
                 </button>
             </form>
@@ -325,7 +327,7 @@
         // 1. MANEJAR ENVÍO DEL FORMULARIO
         // ============================================
         document.getElementById('formComentario').addEventListener('submit', async function(e) {
-            e.preventDefault(); // Prevenir envío normal
+            e.preventDefault();
             
             const btnEnviar = document.getElementById('btnEnviar');
             const mensajeDiv = document.getElementById('mensajeFormulario');
@@ -356,99 +358,125 @@
             btnEnviar.disabled = true;
             
             try {
-                console.log('Enviando comentario a Netlify Function...');
+                console.log('Enviando comentario a Hugging Face...');
                 
-                // Llamar DIRECTAMENTE a tu función de Netlify
-                const response = await fetch('/.netlify/functions/ClasificarComentarios', {
+                // TU ENDPOINT DE HUGGING FACE
+                // IMPORTANTE: Reemplaza 'TU_MODELO' con el nombre correcto de tu modelo en Hugging Face
+                const HF_API_URL = "https://api-inference.huggingface.co/models/TU_USUARIO/TU_MODELO";
+                // O si es un espacio, usa: "https://api-inference.huggingface.co/models/espacio/TU_USUARIO/TU_MODELO"
+                
+                // TU TOKEN DE HUGGING FACE (¡CUIDADO CON EXPONERLO!)
+                const HF_TOKEN = "hf__wcNz"; // Considera usar variables de entorno en producción
+                
+                // Preparar datos para la API de Hugging Face
+                const datosParaAPI = {
+                    inputs: {
+                        nombre: nombre,
+                        valoracion: parseInt(valoracion),
+                        comentario: comentario
+                    }
+                };
+                
+                // Llamar a la API de Hugging Face
+                const response = await fetch(HF_API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${HF_TOKEN}`
                     },
-                    body: JSON.stringify({
-                        payload: {
-                            data: {
-                                nombre: nombre,
-                                valoracion: parseInt(valoracion),
-                                comentario: comentario
-                            }
-                        }
-                    })
+                    body: JSON.stringify(datosParaAPI)
                 });
                 
-                const resultado = await response.json();
-                console.log('Respuesta del servidor:', resultado);
-                
-                if (response.ok) {
-                    // Mostrar éxito
-                    mostrarMensaje('exito', resultado.mensaje || '✅ Comentario enviado y moderado correctamente');
-                    
-                    // Limpiar formulario
-                    document.getElementById('formComentario').reset();
-                    
-                    // Recargar comentarios después de 2 segundos
-                    setTimeout(() => {
-                        cargarComentarios();
-                    }, 2000);
-                    
-                } else {
-                    throw new Error(resultado.error || resultado.detalle || 'Error desconocido del servidor');
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
                 }
+                
+                const resultado = await response.json();
+                console.log('Respuesta de Hugging Face:', resultado);
+                
+                // Aquí necesitas adaptar esto según la respuesta de tu API
+                // Si tu API devuelve un mensaje de éxito
+                mostrarMensaje('exito', '✅ Comentario enviado y analizado correctamente');
+                
+                // Limpiar formulario
+                document.getElementById('formComentario').reset();
+                
+                // Recargar comentarios después de 2 segundos
+                setTimeout(() => {
+                    // Aquí deberías cargar los comentarios desde tu backend
+                    // Por ahora, agregamos el comentario localmente
+                    agregarComentarioLocal(nombre, valoracion, comentario, resultado.clasificacion);
+                }, 2000);
                 
             } catch (error) {
                 console.error('Error al enviar comentario:', error);
-                mostrarMensaje('error', `Error: ${error.message}. Intenta nuevamente.`);
+                
+                // Si falla la API, guardar localmente
+                mostrarMensaje('info', '⚠️ API no disponible. Guardando localmente...');
+                
+                // Guardar en localStorage como fallback
+                guardarComentarioLocal(nombre, valoracion, comentario);
+                
+                document.getElementById('formComentario').reset();
             } finally {
-                // Restaurar botón
                 btnEnviar.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar comentario';
                 btnEnviar.disabled = false;
             }
         });
-        
-        // Función para mostrar mensajes
-        function mostrarMensaje(tipo, texto) {
-            const mensajeDiv = document.getElementById('mensajeFormulario');
-            const icono = tipo === 'exito' ? 'fa-check-circle' : 'fa-exclamation-triangle';
-            const clase = tipo === 'exito' ? 'exito' : 'error';
-            
-            mensajeDiv.innerHTML = `
-                <div class="${clase}">
-                    <i class="fas ${icono}"></i> 
-                    ${texto}
-                </div>
-            `;
-            
-            // Auto-eliminar mensaje después de 5 segundos
-            setTimeout(() => {
-                mensajeDiv.innerHTML = '';
-            }, 5000);
+
+        // Función para guardar comentarios localmente (fallback)
+        function guardarComentarioLocal(nombre, valoracion, comentario) {
+            try {
+                const comentarios = JSON.parse(localStorage.getItem('franRomComentarios')) || [];
+                const nuevoComentario = {
+                    id: Date.now(),
+                    nombre: nombre,
+                    valoracion: parseInt(valoracion),
+                    comentario: comentario,
+                    fecha: new Date().toISOString(),
+                    clasificacion: valoracion >= 3 ? 'bueno' : 'malo' // Clasificación simple
+                };
+                
+                comentarios.unshift(nuevoComentario);
+                localStorage.setItem('franRomComentarios', JSON.stringify(comentarios));
+                
+                // Actualizar la lista
+                mostrarComentarios(comentarios);
+                
+            } catch (error) {
+                console.error('Error guardando localmente:', error);
+                mostrarMensaje('error', 'Error guardando el comentario');
+            }
         }
-        
+
+        // Función para agregar comentario localmente
+        function agregarComentarioLocal(nombre, valoracion, comentario, clasificacion = null) {
+            const comentarios = JSON.parse(localStorage.getItem('franRomComentarios')) || [];
+            const nuevoComentario = {
+                id: Date.now(),
+                nombre: nombre,
+                valoracion: parseInt(valoracion),
+                comentario: comentario,
+                fecha: new Date().toISOString(),
+                clasificacion: clasificacion || (valoracion >= 3 ? 'bueno' : 'malo')
+            };
+            
+            comentarios.unshift(nuevoComentario);
+            localStorage.setItem('franRomComentarios', JSON.stringify(comentarios));
+            
+            mostrarComentarios(comentarios);
+        }
+
         // ============================================
-        // 2. CARGAR Y MOSTRAR COMENTARIOS
+        // 2. CARGAR Y MOSTRAR COMENTARIOS DESDE LOCALSTORAGE
         // ============================================
-        async function cargarComentarios() {
+        function cargarComentarios() {
             try {
                 const listaComentarios = document.getElementById('lista-comentarios');
-                
-                // Mostrar cargando
-                listaComentarios.innerHTML = `
-                    <div class="cargando">
-                        <i class="fas fa-spinner fa-spin"></i> Cargando comentarios...
-                    </div>
-                `;
-                
-                console.log('Cargando comentarios desde Netlify Function...');
-                const respuesta = await fetch('/.netlify/functions/ObtenerComentarios');
-                
-                if (!respuesta.ok) {
-                    throw new Error(`Error ${respuesta.status}: No se pudieron cargar los comentarios`);
-                }
-                
-                const comentarios = await respuesta.json();
-                console.log(`Comentarios cargados: ${comentarios.length}`);
+                const comentarios = JSON.parse(localStorage.getItem('franRomComentarios')) || [];
                 
                 // Obtener filtro activo
-                const filtroActivo = document.querySelector('.filtro-btn.activo').getAttribute('data-filtro');
+                const filtroActivo = document.querySelector('.filtro-btn.activo')?.getAttribute('data-filtro') || 'todos';
                 mostrarComentarios(comentarios, filtroActivo);
                 
             } catch (error) {
@@ -456,12 +484,12 @@
                 document.getElementById('lista-comentarios').innerHTML = `
                     <div class="error-comentario">
                         <i class="fas fa-exclamation-triangle"></i> 
-                        Error cargando comentarios. Recarga la página o intenta más tarde.
+                        Error cargando comentarios.
                     </div>
                 `;
             }
         }
-        
+
         function mostrarComentarios(comentarios, filtro = 'todos') {
             const contenedor = document.getElementById('lista-comentarios');
             
@@ -475,7 +503,7 @@
                 return;
             }
             
-            // Filtrar comentarios si es necesario
+            // Filtrar comentarios
             let comentariosFiltrados = comentarios;
             if (filtro === 'buenos') {
                 comentariosFiltrados = comentarios.filter(c => c.clasificacion === 'bueno');
@@ -507,13 +535,13 @@
                     minute: '2-digit'
                 });
                 
-                // Crear estrellas según valoración
+                // Crear estrellas
                 let estrellas = '';
                 for (let i = 1; i <= 5; i++) {
                     estrellas += i <= comentario.valoracion ? '⭐' : '☆';
                 }
                 
-                // Determinar clase CSS según clasificación
+                // Determinar clase CSS
                 let claseCss = 'comentario-card';
                 if (comentario.clasificacion === 'bueno') {
                     claseCss += ' comentario-bueno';
@@ -554,7 +582,7 @@
             
             contenedor.innerHTML = html;
         }
-        
+
         // ============================================
         // 3. MANEJAR FILTROS
         // ============================================
@@ -563,30 +591,43 @@
             
             filtroBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
-                    // Remover clase activa de todos
                     filtroBtns.forEach(b => b.classList.remove('activo'));
-                    // Agregar clase activa al botón clickeado
                     this.classList.add('activo');
                     
-                    // Obtener comentarios y aplicar filtro
-                    fetch('/.netlify/functions/ObtenerComentarios')
-                        .then(res => res.json())
-                        .then(comentarios => {
-                            const filtro = this.getAttribute('data-filtro');
-                            mostrarComentarios(comentarios, filtro);
-                        })
-                        .catch(error => {
-                            console.error('Error al filtrar:', error);
-                        });
+                    // Aplicar filtro
+                    const comentarios = JSON.parse(localStorage.getItem('franRomComentarios')) || [];
+                    const filtro = this.getAttribute('data-filtro');
+                    mostrarComentarios(comentarios, filtro);
                 });
             });
             
             // Cargar comentarios cuando la página se carga
             cargarComentarios();
-            
-            // Recargar comentarios cada 30 segundos
-            setInterval(cargarComentarios, 30000);
         });
+
+        // ============================================
+        // 4. FUNCIÓN PARA MOSTRAR MENSAJES
+        // ============================================
+        function mostrarMensaje(tipo, texto) {
+            const mensajeDiv = document.getElementById('mensajeFormulario');
+            const icono = tipo === 'exito' ? 'fa-check-circle' : 
+                        tipo === 'error' ? 'fa-exclamation-triangle' : 
+                        'fa-info-circle';
+            const clase = tipo === 'exito' ? 'exito' : 
+                        tipo === 'error' ? 'error' : 
+                        'info';
+            
+            mensajeDiv.innerHTML = `
+                <div class="${clase}">
+                    <i class="fas ${icono}"></i> 
+                    ${texto}
+                </div>
+            `;
+            
+            setTimeout(() => {
+                mensajeDiv.innerHTML = '';
+            }, 5000);
+        }
         
         // ============================================
         // 4. ESTILOS PARA LOS COMENTARIOS

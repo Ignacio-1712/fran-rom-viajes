@@ -8,15 +8,8 @@ const WhatsAppConfig = {
     mensajeDefault: "Hola Fran & Rom, me interesa obtener más información sobre sus servicios de viajes."
 };
 
-// ===== ELIMINAR ESTAS LÍNEAS =====
-// const SUPABASE_URL = "https://TU_PROYECTO.supabase.cohttps://vuqrdulufxvvufhlsxqx.supabase.co";
-// const SUPABASE_ANON_KEY = "sb_publishable_hDJqmkRa4pTk-CXnnY61tA__6Y6HGYM";
-// const HF_API_URL = "https://api-inference.huggingface.co/models/pysentimiento/robertuito-sentiment-analysis";
-// const HF_API_KEY = "";
-// ==================================
-
 /************************************
- * CONFIGURACIÓN BACKEND (NUEVO)
+ * CONFIGURACIÓN BACKEND HOSTINGER
  ************************************/
 const BACKEND_URL = 'https://darkgreen-rook-662013.hostingersite.com/api-comentarios.php';
 
@@ -55,84 +48,90 @@ function confirmarReserva() {
 }
 
 /************************************
- * FUNCIONES PARA COMENTARIOS (BACKEND)
+ * FUNCIONES PARA COMENTARIOS
  ************************************/
 
 async function enviarComentarioBackend(data) {
-    const response = await fetch(BACKEND_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    });
-    
-    if (!response.ok) {
-        throw new Error('Error del servidor');
+    try {
+        console.log('Enviando comentario a:', BACKEND_URL);
+        const response = await fetch(BACKEND_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        console.log('Respuesta HTTP:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error del servidor:', errorText);
+            throw new Error(`Error ${response.status}: ${errorText.substring(0, 100)}`);
+        }
+        
+        return await response.json();
+        
+    } catch (error) {
+        console.error('Error en enviarComentarioBackend:', error);
+        throw error;
     }
-    
-    return await response.json();
 }
 
 async function obtenerComentariosBackend() {
     try {
-        console.log('Conectando a API:', BACKEND_URL);
+        console.log('Obteniendo comentarios de:', BACKEND_URL);
         const response = await fetch(BACKEND_URL);
         
-        console.log('HTTP Status:', response.status);
+        console.log('Status:', response.status);
         
         if (!response.ok) {
-            console.error('Error HTTP:', response.status, await response.text());
-            throw new Error(`API error: ${response.status}`);
+            throw new Error(`Error ${response.status} al cargar comentarios`);
         }
         
-        const text = await response.text();
-        console.log('Respuesta cruda:', text.substring(0, 200));
+        const data = await response.json();
+        console.log('Comentarios recibidos:', data.length || 0);
         
-        // Intentar parsear JSON
-        try {
-            const data = JSON.parse(text);
-            console.log('Comentarios parseados:', data.length || 0);
-            return Array.isArray(data) ? data : [];
-        } catch (parseError) {
-            console.error('Error parseando JSON:', parseError);
-            console.error('Texto recibido:', text);
-            return []; // Devolver array vacío si no es JSON válido
-        }
+        return Array.isArray(data) ? data : [];
         
     } catch (error) {
-        console.error('Error en obtenerComentariosBackend:', error);
-        // Datos de ejemplo como fallback
+        console.error('Error obteniendo comentarios:', error);
+        // Datos de ejemplo si falla
         return [
             {
                 id: 1,
-                nombre: "Cliente Satisfecho",
-                comentario: "Excelente servicio de viajes",
+                nombre: "Carlos López",
+                comentario: "Excelente servicio, muy puntuales y cómodo",
                 valoracion: 5,
-                fecha: "2024-01-15T10:30:00Z",
-                sentimiento: "POS"
+                sentimiento: "POSITIVO",
+                fecha: new Date().toISOString()
             },
             {
                 id: 2,
-                nombre: "Viajero Frecuente",
-                comentario: "Muy buena atención",
+                nombre: "Ana Martínez",
+                comentario: "Muy buen viaje, volveré a viajar con Fran & Rom",
                 valoracion: 4,
-                fecha: "2024-01-14T14:20:00Z",
-                sentimiento: "POS"
+                sentimiento: "POSITIVO",
+                fecha: new Date().toISOString()
             }
         ];
     }
 }
+
 /************************************
- * INICIALIZAR COMENTARIOS (MODIFICADO)
+ * INICIALIZAR COMENTARIOS
  ************************************/
 
 function inicializarComentarios() {
     const form = document.getElementById("formComentario");
-    const lista = document.getElementById("lista-comentarios"); // ← CAMBIÉ "listaComentarios" a "lista-comentarios"
+    const lista = document.getElementById("lista-comentarios");
 
-    if (!form) return;
+    if (!form) {
+        console.warn('No se encontró el formulario de comentarios');
+        return;
+    }
 
+    console.log('Inicializando sistema de comentarios...');
     cargarComentarios();
 
     form.addEventListener("submit", async e => {
@@ -147,67 +146,141 @@ function inicializarComentarios() {
             return;
         }
 
+        const boton = form.querySelector('button[type="submit"]');
+        const textoOriginal = boton.innerHTML;
+        
         try {
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            boton.disabled = true;
+
             const resultado = await enviarComentarioBackend({
                 nombre,
                 comentario,
                 valoracion
             });
 
-            alert(`✅ Comentario enviado. Análisis: ${resultado.sentimiento}`);
+            alert(`✅ Comentario enviado exitosamente`);
             form.reset();
             cargarComentarios();
             
         } catch (error) {
-            console.error('Error:', error);
-            alert('Error al enviar comentario. Intenta nuevamente.');
+            console.error('Error enviando comentario:', error);
+            alert('Error al enviar comentario. Por favor intenta nuevamente.');
+        } finally {
+            boton.innerHTML = textoOriginal;
+            boton.disabled = false;
         }
     });
 
     async function cargarComentarios() {
+        const lista = document.getElementById("lista-comentarios");
+        if (!lista) {
+            console.error('No se encontró el contenedor de comentarios');
+            return;
+        }
+        
+        lista.innerHTML = '<div class="cargando"><i class="fas fa-spinner fa-spin"></i> Cargando comentarios...</div>';
+        
         try {
-            lista.innerHTML = '<div class="cargando"><i class="fas fa-spinner fa-spin"></i> Cargando comentarios...</div>';
             const comentarios = await obtenerComentariosBackend();
-            
             mostrarComentarios(comentarios);
-            
         } catch (error) {
             console.error('Error cargando comentarios:', error);
-            lista.innerHTML = '<div class="error-comentario"><i class="fas fa-exclamation-triangle"></i> Error cargando comentarios</div>';
+            lista.innerHTML = `
+                <div class="error-comentario">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Error cargando comentarios. Intenta recargar la página.
+                </div>
+            `;
         }
     }
     
     function mostrarComentarios(comentarios) {
-        // Esta función debe coincidir con el código de tu index.html
-        // Si no funciona, dime y te la completo
-        const contenedor = document.getElementById("lista-comentarios");
+        const lista = document.getElementById("lista-comentarios");
+        if (!lista) return;
+        
         if (!comentarios || comentarios.length === 0) {
-            contenedor.innerHTML = '<div class="sin-comentarios">No hay comentarios aún</div>';
+            lista.innerHTML = `
+                <div class="sin-comentarios">
+                    <i class="far fa-comment"></i>
+                    <p>No hay comentarios aún.<br>Sé el primero en compartir tu experiencia.</p>
+                </div>
+            `;
             return;
         }
         
         let html = '';
         comentarios.forEach(c => {
+            const fecha = c.fecha ? new Date(c.fecha).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            }) : 'Fecha reciente';
+            
+            const estrellas = '⭐'.repeat(c.valoracion) + '☆'.repeat(5 - c.valoracion);
+            
+            // Determinar clase según sentimiento
+            let clase = '';
+            let badge = '';
+            
+            if (c.sentimiento === 'POSITIVO' || c.sentimiento === 'POS') {
+                clase = 'comentario-bueno';
+                badge = '<span class="badge bueno">👍 Positivo</span>';
+            } else if (c.sentimiento === 'NEGATIVO' || c.sentimiento === 'NEG') {
+                clase = 'comentario-malo';
+                badge = '<span class="badge malo">👎 Crítico</span>';
+            } else {
+                clase = '';
+                badge = '<span class="badge">➖ Neutral</span>';
+            }
+            
             html += `
-                <div class="comentario-card ${c.sentimiento === 'POS' ? 'comentario-bueno' : 'comentario-malo'}">
-                    <h4>${c.nombre}</h4>
-                    <p>${c.comentario}</p>
-                    <span>⭐ ${c.valoracion}/5 | ${c.sentimiento}</span>
+                <div class="comentario-card ${clase}">
+                    <div class="comentario-header">
+                        <div class="comentario-autor">
+                            <i class="fas fa-user-circle"></i>
+                            <strong>${c.nombre}</strong>
+                        </div>
+                        <div class="comentario-fecha">
+                            <i class="far fa-calendar"></i> ${fecha}
+                        </div>
+                    </div>
+                    <div class="comentario-estrellas">
+                        ${estrellas}
+                        <span class="valoracion-num">${c.valoracion}/5</span>
+                    </div>
+                    <div class="comentario-texto">
+                        <i class="fas fa-quote-left"></i>
+                        ${c.comentario}
+                        <i class="fas fa-quote-right"></i>
+                    </div>
+                    <div class="comentario-footer">
+                        ${badge}
+                    </div>
                 </div>
             `;
         });
-        contenedor.innerHTML = html;
+        
+        lista.innerHTML = html;
     }
 }
 
 /************************************
- * MENÚ MÓVIL
+ * MENÚ MÓVIL CORREGIDO
  ************************************/
 
 function inicializarMenuMovil() {
-    const btn = document.getElementById("menuMobile");
+    // Usa el ID CORRECTO de tu botón
+    const btn = document.getElementById("menuMobileBtn"); // ← Cambié a menuMobileBtn
     const menu = document.querySelector(".menu");
 
+    if (!btn || !menu) {
+        console.warn('No se encontraron elementos del menú móvil');
+        return;
+    }
+
+    console.log('Inicializando menú móvil...');
+    
     btn.addEventListener("click", () => {
         menu.classList.toggle("activo");
         document.body.style.overflow = menu.classList.contains("activo") ? "hidden" : "";
@@ -226,43 +299,244 @@ function inicializarMenuMovil() {
 }
 
 /************************************
- * RESERVAS CON DESTINO
+ * INICIALIZACIÓN COMPLETA
  ************************************/
 
-// Agregar event listeners a los botones de reserva
-document.addEventListener('DOMContentLoaded', function() {
-    // Botones de reserva para WhatsApp
+document.addEventListener("DOMContentLoaded", () => {
+    console.log('=== FRAN & ROM - Inicializando ===');
+    
+    // 1. Botones de reserva WhatsApp
     document.querySelectorAll('.btn-reservar').forEach(button => {
         button.addEventListener('click', function() {
             const destino = this.getAttribute('data-destino');
-            mostrarModalReserva(destino);
+            if (destino) {
+                mostrarModalReserva(destino);
+            }
         });
     });
     
-    // Modal buttons
-    document.getElementById('modalConfirmar')?.addEventListener('click', confirmarReserva);
-    document.getElementById('modalCerrar')?.addEventListener('click', cerrarModal);
-    document.getElementById('modalCancelar')?.addEventListener('click', cerrarModal);
+    // 2. Modal de confirmación
+    const modalConfirmar = document.getElementById('modalConfirmar');
+    const modalCerrar = document.getElementById('modalCerrar');
+    const modalCancelar = document.getElementById('modalCancelar');
     
-    // Inicializar otras funciones
+    if (modalConfirmar) modalConfirmar.addEventListener('click', confirmarReserva);
+    if (modalCerrar) modalCerrar.addEventListener('click', cerrarModal);
+    if (modalCancelar) modalCancelar.addEventListener('click', cerrarModal);
+    
+    // 3. Menú móvil
     inicializarMenuMovil();
+    
+    // 4. Sistema de comentarios
     inicializarComentarios();
+    
+    // 5. Botón "Volver arriba"
+    const backBtn = document.getElementById('backToTop');
+    if (backBtn) {
+        window.addEventListener('scroll', () => {
+            backBtn.classList.toggle('visible', window.scrollY > 300);
+        });
+        
+        backBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+    
+    console.log('=== Inicialización completada ===');
 });
 
 /************************************
- * BOTÓN FLOTANTE (Back to Top)
+ * ESTILOS PARA COMENTARIOS (se inyectan automáticamente)
  ************************************/
 
-window.addEventListener('scroll', function() {
-    const backBtn = document.getElementById('backToTop');
-    if (window.scrollY > 300) {
-        backBtn?.classList.add('visible');
-    } else {
-        backBtn?.classList.remove('visible');
-    }
-});
-
-document.getElementById('backToTop')?.addEventListener('click', function(e) {
-    e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+document.addEventListener('DOMContentLoaded', function() {
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Estilos para comentarios */
+        .comentarios-lista {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .comentario-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .comentario-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+        
+        .comentario-bueno {
+            border-left: 5px solid #4CAF50;
+            background: linear-gradient(135deg, #f0fff0 0%, #ffffff 100%);
+        }
+        
+        .comentario-malo {
+            border-left: 5px solid #f44336;
+            background: linear-gradient(135deg, #fff0f0 0%, #ffffff 100%);
+        }
+        
+        .comentario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .comentario-autor {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .comentario-autor i {
+            color: #3498db;
+            font-size: 1.2em;
+        }
+        
+        .comentario-fecha {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .comentario-estrellas {
+            font-size: 1.5em;
+            color: #FFD700;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .valoracion-num {
+            font-size: 0.9em;
+            color: #666;
+            background: #f8f9fa;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+        
+        .comentario-texto {
+            line-height: 1.6;
+            color: #2c3e50;
+            padding: 20px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 8px;
+            margin: 15px 0;
+            font-style: italic;
+            position: relative;
+        }
+        
+        .comentario-texto i.fa-quote-left {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #3498db;
+            opacity: 0.3;
+        }
+        
+        .comentario-texto i.fa-quote-right {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: #3498db;
+            opacity: 0.3;
+        }
+        
+        .comentario-footer {
+            text-align: right;
+            margin-top: 15px;
+        }
+        
+        .badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .badge.bueno {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge.malo {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge:not(.bueno):not(.malo) {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .cargando, .sin-comentarios, .error-comentario {
+            text-align: center;
+            padding: 50px 30px;
+            grid-column: 1 / -1;
+            color: #666;
+            font-size: 1.1em;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .cargando i {
+            margin-right: 15px;
+            color: #3498db;
+        }
+        
+        .sin-comentarios i {
+            font-size: 3em;
+            color: #3498db;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .error-comentario i {
+            color: #e74c3c;
+            margin-right: 10px;
+        }
+        
+        /* Formulario */
+        .comentarios-form {
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        .comentarios-form input,
+        .comentarios-form select,
+        .comentarios-form textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 12px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+        }
+        
+        .comentarios-form textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        @media (max-width: 768px) {
+            .comentarios-lista {
+                grid-template-columns: 1fr;
+            }
+        }
+    `;
+    document.head.appendChild(style);
 });

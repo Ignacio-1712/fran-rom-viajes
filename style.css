@@ -1472,3 +1472,37 @@ body {
     pointer-events: auto;
     touch-action: manipulation;
 }
+
+/* Estilos para filtros de comentarios */
+.comentarios-filtros {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.filtro-btn {
+    padding: 12px 30px;
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: #495057;
+    font-size: 1em;
+}
+
+.filtro-btn:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.filtro-btn.activo {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}

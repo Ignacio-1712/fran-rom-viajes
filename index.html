@@ -287,39 +287,24 @@
         </div>
 
         <!-- Formulario MODIFICADO -->
-        <form id="formComentario" class="comentarios-form">
-            <div id="mensajeFormulario" class="mensaje-formulario"></div>
-
-            <input 
-                type="text"
-                id="nombre"
-                name="nombre"
-                placeholder="Tu nombre"
-                required
-                autocomplete="name"
-            />
-
-            <select id="valoracion" name="valoracion" required>
-                <option value="">Calificación</option>
-                <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
-                <option value="4">⭐⭐⭐⭐ Muy bueno</option>
-                <option value="3">⭐⭐⭐ Regular</option>
-                <option value="2">⭐⭐ Malo</option>
-                <option value="1">⭐ Muy malo</option>
-            </select>
-
-            <textarea 
-                    id="comentario"
-                    name="comentario"
-                    placeholder="Escribí tu comentario..."
-                    required
-                    rows="4">
-            </textarea>
-
-            <button type="submit" class="btn-hero" id="btnEnviar">
-                <i class="fas fa-paper-plane"></i> Enviar comentario
-            </button>
-        </form>
+           <form id="formComentario" class="comentarios-form">
+                <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+                
+                <select id="valoracion" name="valoracion" required>
+                    <option value="">Calificación</option>
+                    <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                    <option value="4">⭐⭐⭐⭐ Muy bueno</option>
+                    <option value="3">⭐⭐⭐ Regular</option>
+                    <option value="2">⭐⭐ Malo</option>
+                    <option value="1">⭐ Muy malo</option>
+                </select>
+                
+                <textarea id="comentario" name="comentario" placeholder="Escribe tu comentario..." required rows="4"></textarea>
+                
+                <button type="submit" class="btn-hero">
+                    <i class="fas fa-paper-plane"></i> Enviar comentario
+                </button>
+            </form>
 
 
         <!-- Filtros -->

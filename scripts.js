@@ -266,6 +266,98 @@ function inicializarComentarios() {
 }
 
 /************************************
+ * FILTROS DE COMENTARIOS
+ ************************************/
+
+function inicializarFiltros() {
+    const filtroBtns = document.querySelectorAll('.filtro-btn');
+    
+    if (!filtroBtns.length) {
+        console.warn('No se encontraron botones de filtro');
+        return;
+    }
+    
+    filtroBtns.forEach(btn => {
+        btn.addEventListener('click', async function() {
+            // Remover clase activa de todos los botones
+            filtroBtns.forEach(b => b.classList.remove('activo'));
+            // Agregar clase activa al botón clickeado
+            this.classList.add('activo');
+            
+            const filtro = this.getAttribute('data-filtro');
+            console.log('Aplicando filtro:', filtro);
+            
+            // Cargar y mostrar comentarios con el filtro
+            await aplicarFiltro(filtro);
+        });
+    });
+}
+
+async function aplicarFiltro(filtro) {
+    const lista = document.getElementById("lista-comentarios");
+    if (!lista) return;
+    
+    lista.innerHTML = '<div class="cargando"><i class="fas fa-spinner fa-spin"></i> Aplicando filtro...</div>';
+    
+    try {
+        const comentarios = await obtenerComentariosBackend();
+        mostrarComentariosFiltrados(comentarios, filtro);
+    } catch (error) {
+        console.error('Error aplicando filtro:', error);
+        lista.innerHTML = `
+            <div class="error-comentario">
+                <i class="fas fa-exclamation-triangle"></i> 
+                Error aplicando filtro.
+            </div>
+        `;
+    }
+}
+
+function mostrarComentariosFiltrados(comentarios, filtro) {
+    const lista = document.getElementById("lista-comentarios");
+    if (!lista) return;
+    
+    if (!comentarios || comentarios.length === 0) {
+        lista.innerHTML = `
+            <div class="sin-comentarios">
+                <i class="far fa-comment"></i>
+                <p>No hay comentarios aún.<br>Sé el primero en compartir tu experiencia.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Filtrar comentarios según el filtro seleccionado
+    let comentariosFiltrados = comentarios;
+    
+    if (filtro === 'buenos') {
+        comentariosFiltrados = comentarios.filter(c => 
+            c.sentimiento === 'POSITIVO' || c.sentimiento === 'POS' || c.valoracion >= 4
+        );
+    } else if (filtro === 'malos') {
+        comentariosFiltrados = comentarios.filter(c => 
+            c.sentimiento === 'NEGATIVO' || c.sentimiento === 'NEG' || c.valoracion <= 2
+        );
+    }
+    // Si es 'todos', no filtra nada
+    
+    if (comentariosFiltrados.length === 0) {
+        const mensaje = filtro === 'buenos' ? 'comentarios positivos' : 
+                       filtro === 'malos' ? 'comentarios críticos' : 'comentarios';
+        lista.innerHTML = `
+            <div class="sin-comentarios">
+                <i class="far fa-comment"></i>
+                <p>No hay ${mensaje} aún.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Mostrar los comentarios filtrados
+    mostrarComentarios(comentariosFiltrados);
+}
+
+/************************************
  * MENÚ MÓVIL CORREGIDO
  ************************************/
 
@@ -350,193 +442,3 @@ document.addEventListener("DOMContentLoaded", () => {
  * ESTILOS PARA COMENTARIOS (se inyectan automáticamente)
  ************************************/
 
-document.addEventListener('DOMContentLoaded', function() {
-    const style = document.createElement('style');
-    style.textContent = `
-        /* Estilos para comentarios */
-        .comentarios-lista {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-        
-        .comentario-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
-        }
-        
-        .comentario-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-        }
-        
-        .comentario-bueno {
-            border-left: 5px solid #4CAF50;
-            background: linear-gradient(135deg, #f0fff0 0%, #ffffff 100%);
-        }
-        
-        .comentario-malo {
-            border-left: 5px solid #f44336;
-            background: linear-gradient(135deg, #fff0f0 0%, #ffffff 100%);
-        }
-        
-        .comentario-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .comentario-autor {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .comentario-autor i {
-            color: #3498db;
-            font-size: 1.2em;
-        }
-        
-        .comentario-fecha {
-            color: #7f8c8d;
-            font-size: 0.9em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .comentario-estrellas {
-            font-size: 1.5em;
-            color: #FFD700;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .valoracion-num {
-            font-size: 0.9em;
-            color: #666;
-            background: #f8f9fa;
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
-        
-        .comentario-texto {
-            line-height: 1.6;
-            color: #2c3e50;
-            padding: 20px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 8px;
-            margin: 15px 0;
-            font-style: italic;
-            position: relative;
-        }
-        
-        .comentario-texto i.fa-quote-left {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #3498db;
-            opacity: 0.3;
-        }
-        
-        .comentario-texto i.fa-quote-right {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            color: #3498db;
-            opacity: 0.3;
-        }
-        
-        .comentario-footer {
-            text-align: right;
-            margin-top: 15px;
-        }
-        
-        .badge {
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-        
-        .badge.bueno {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .badge.malo {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .badge:not(.bueno):not(.malo) {
-            background: #e2e3e5;
-            color: #383d41;
-        }
-        
-        .cargando, .sin-comentarios, .error-comentario {
-            text-align: center;
-            padding: 50px 30px;
-            grid-column: 1 / -1;
-            color: #666;
-            font-size: 1.1em;
-            background: #f8f9fa;
-            border-radius: 12px;
-            border: 2px dashed #dee2e6;
-        }
-        
-        .cargando i {
-            margin-right: 15px;
-            color: #3498db;
-        }
-        
-        .sin-comentarios i {
-            font-size: 3em;
-            color: #3498db;
-            margin-bottom: 20px;
-            display: block;
-        }
-        
-        .error-comentario i {
-            color: #e74c3c;
-            margin-right: 10px;
-        }
-        
-        /* Formulario */
-        .comentarios-form {
-            max-width: 600px;
-            margin: 0 auto 40px;
-        }
-        
-        .comentarios-form input,
-        .comentarios-form select,
-        .comentarios-form textarea {
-            width: 100%;
-            padding: 15px;
-            margin: 12px 0;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
-        }
-        
-        .comentarios-form textarea {
-            min-height: 150px;
-            resize: vertical;
-        }
-        
-        @media (max-width: 768px) {
-            .comentarios-lista {
-                grid-template-columns: 1fr;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-});
